@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openweather-proxy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openweather-proxy
+  labels:
+    app: openweather-proxy
+    service: openweather-proxy
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: openweather-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openweather-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openweather-proxy
+  template:
+    metadata:
+      labels:
+        app: openweather-proxy
+    spec:
+      terminationGracePeriodSeconds: 0
+      serviceAccountName: openweather-proxy
+      containers:
+      - name: openweather-proxy
+        image: openweather-proxy:1.0
+        imagePullPolicy: Never
+        env:
+        - name: OWM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openweather
+              key: api-key
+        - name: PORT
+          value: "80"
+---

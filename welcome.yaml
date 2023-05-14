@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: welcome
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: welcome
+  labels:
+    app: welcome
+    service: welcome
+spec:
+  ports:
+  - port: 80
+    name: http
+  selector:
+    app: welcome
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: welcome
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: welcome
+  template:
+    metadata:
+      labels:
+        app: welcome
+    spec:
+      terminationGracePeriodSeconds: 0
+      serviceAccountName: welcome
+      containers:
+      - name: welcome
+        image: welcome:1.0
+        imagePullPolicy: Never
+        env:
+        - name: ENDPOINT
+          value: http://openweather-proxy/weather
+        - name: PORT
+          value: "80"
+---

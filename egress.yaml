@@ -1,0 +1,74 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: ServiceEntry
+metadata:
+  name: openweathermap
+spec:
+  hosts:
+  - api.openweathermap.org
+  ports:
+  - number: 443
+    name: tls
+    protocol: TLS
+  resolution: DNS
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-egressgateway
+spec:
+  selector:
+    istio: egressgateway
+  servers:
+  - port:
+      number: 443
+      name: tls
+      protocol: TLS
+    hosts:
+    - api.openweathermap.org
+    tls:
+      mode: PASSTHROUGH
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: egressgateway-for-openweathermap
+spec:
+  host: istio-egressgateway.istio-system.svc.cluster.local
+  subsets:
+  - name: openweathermap
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: direct-openweathermap-through-egress-gateway
+spec:
+  hosts:
+  - api.openweathermap.org
+  gateways:
+  - mesh
+  - istio-egressgateway
+  tls:
+  - match:
+    - gateways:
+      - mesh
+      port: 443
+      sniHosts:
+      - api.openweathermap.org
+    route:
+    - destination:
+        host: istio-egressgateway.istio-system.svc.cluster.local
+        subset: openweathermap
+        port:
+          number: 443
+  - match:
+    - gateways:
+      - istio-egressgateway
+      port: 443
+      sniHosts:
+      - api.openweathermap.org
+    route:
+    - destination:
+        host: api.openweathermap.org
+        port:
+          number: 443
+      weight: 100

@@ -1,0 +1,4 @@
+github.com/briandowns/openweathermap v0.19.0 h1:nkopLMEtZLxbZI1th6dOG6xkajpszofqf53r5K8mT9k=
+github.com/briandowns/openweathermap v0.19.0/go.mod h1:0GLnknqicWxXnGi1IqoOaZIw+kIe5hkt+YM5WY3j8+0=
+github.com/go-chi/chi v1.5.4 h1:QHdzF2szwjqVV4wmByUnTcsbIg7UGaQ0tPF2t5GcAIs=
+github.com/go-chi/chi v1.5.4/go.mod h1:uaf8YgoFazUOkPBG7fxPftUylNumIev9awIWOENIuEg=
